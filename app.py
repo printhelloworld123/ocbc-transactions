@@ -39,7 +39,7 @@ class PayNowTransaction:
             fields += info
         final = ''
         for item in fields:
-            final += item
+            final += item + '\n'
         return final
 
 
