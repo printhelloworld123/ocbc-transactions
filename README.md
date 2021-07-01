@@ -1,2 +1,2 @@
 # ocbc-transactions
-OCBC Transactions Prototype 
+OCBC Transactions Prototype created using Streamlit
