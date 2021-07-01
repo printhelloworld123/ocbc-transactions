@@ -1,13 +1,23 @@
+import base64 
+import time
+import pandas as pd 
 import streamlit as st
-import pandas as pd
 
-## Creating the backend transformations ##
+timestr = time.strftime("%d%m%y-%H%M%S")
+
+def text_downloader(raw_text):
+	b64 = base64.b64encode(raw_text.encode()).decode()
+	new_filename = "ocbc_paynow_{}.txt".format(timestr)
+	st.markdown("#### Download txt File ###")
+	href = f'<a href="data:file/txt;base64,{b64}" download="{new_filename}">Click here</a>'
+	st.markdown(href,unsafe_allow_html=True)
+
 
 class PayNowTransaction:
     def __init__(self, file):
         self.file = file
         self.date = str(date).split('-')[2] + str(date).split('-')[1] + str(date).split('-')[0]
-        self.name_of_text_tile = name_of_file
+
 
     def prepare_file(self):
         
@@ -27,18 +37,16 @@ class PayNowTransaction:
             proxy_value_final = 6 * ' ' + df.loc[i,'phone'] + 162 * ' '
             info = [amount_final + proxy_type_final + proxy_value_final]
             fields += info
-        with open(str(self.name_of_text_tile + '.txt'), "w") as f:
-            for field in fields:
-                f.write(field)
-                f.write('\n')
+        final = ''
+        for item in fields:
+            final += item
+        return final
 
-## Creating the front end interface ##
 
 st.title('OCBC PayNow Transactions Prototype')
 
 date = st.date_input('Date of transaction', value=None, min_value=None, max_value=None, key=None, help=None)
 
-name_of_file = st.text_input("Name of file", 'Please include the name of your text file')
 
 try:
     uploaded_file = st.file_uploader("Upload a CSV file",type=['csv'])
@@ -49,12 +57,6 @@ try:
     transaction_file.prepare_file()
     st.write('Please check that the data fields have been converted to the correct format')
     transaction_file.file
-    result = st.button('Download')
-    if result:
-        transaction_file.download_file()
-        st.write(str(transaction_file.name_of_text_tile + '.txt') + ' has been downloaded to your computer :smile:')
+    text_downloader(transaction_file.download_file())
 except ValueError or NameError:
     pass
-
-
-
