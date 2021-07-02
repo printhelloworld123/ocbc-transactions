@@ -26,16 +26,20 @@ class PayNowTransaction:
             nos_zeros = 17 - len(new_value)
             return "0" * nos_zeros + new_value 
         
+        self.file['name'] = self.file.apply(lambda x: x['name'].upper(), axis=1)
+        self.file['name'] = self.file.apply(lambda x: x['name'].replace(' ', ''), axis=1)
         self.file['phone'] = self.file.apply(lambda x: '+65' + str(int(x['phone'])), axis=1)
         self.file['amount'] = self.file.apply(lambda x: convert_amount(x['amount']),axis=1)
         
     def download_file(self):
         fields = ['10' + 11 * ' ' + 'OCBCSGSGXXX695271080001'+ 169 * ' ' + 'GIRO' + 16 * ' ' + self.date + 767 * ' ']
-        for i in range(len(df)):
-            amount_final = 188 * ' ' + df.loc[i,'amount']
+        for i in range(len(self.file)):
+            name_final = 45 * ' ' + self.file.loc[i,'name']
+            after_name_space = 188 - len(self.file.loc[i,'name']) - 45
+            amount_final = after_name_space * ' ' + self.file.loc[i,'amount']
             proxy_type_final = 610 * ' ' + 'MSISDN'
-            proxy_value_final = 6 * ' ' + df.loc[i,'phone'] + 162 * ' '
-            info = [amount_final + proxy_type_final + proxy_value_final]
+            proxy_value_final = 6 * ' ' + self.file.loc[i,'phone'] + 162 * ' '
+            info = [name_final + amount_final + proxy_type_final + proxy_value_final]
             fields += info
         final = ''
         for item in fields:
@@ -55,8 +59,11 @@ try:
     df
     transaction_file = PayNowTransaction(df)
     transaction_file.prepare_file()
-    st.write('Please check that the data fields have been converted to the correct format')
+    st.write('Please check that the data fields (name, phone, amount) have been converted to the correct format')
     transaction_file.file
     text_downloader(transaction_file.download_file())
 except ValueError or NameError:
     pass
+
+
+
