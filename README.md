@@ -1,2 +1,2 @@
 # ocbc-transactions
-OCBC Transactions Prototype created using Streamlit
+OCBC PayNow Transactions Processing Prototype created using Streamlit
