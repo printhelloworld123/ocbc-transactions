@@ -28,8 +28,8 @@ class PayNowTransaction:
         
         self.file['name'] = self.file.apply(lambda x: x['name'].upper(), axis=1)
         self.file['name'] = self.file.apply(lambda x: x['name'].replace(' ', ''), axis=1)
-        self.file['phone'] = self.file.apply(lambda x: '+65' + str(int(x['phone'])), axis=1)
-        self.file['phone'] = self.file.apply(lambda x: x['phone'].replace(' ', ''), axis=1)
+        self.file['phone'] = self.file.apply(lambda x: '+65' + str(x['phone']), axis=1)
+        self.file['phone'] = self.file.apply(lambda x: str(x['phone']).replace(' ', ''), axis=1)
         self.file['amount'] = self.file.apply(lambda x: convert_amount(x['amount']),axis=1)
         
     def download_file(self):
