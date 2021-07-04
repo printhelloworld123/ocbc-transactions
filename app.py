@@ -28,6 +28,7 @@ class PayNowTransaction:
         
         self.file['name'] = self.file.apply(lambda x: x['name'].upper(), axis=1)
         self.file['name'] = self.file.apply(lambda x: x['name'].replace(' ', ''), axis=1)
+        self.file['phone'] = self.file.apply(lambda x: x['phone'].replace(' ', ''), axis=1)
         self.file['phone'] = self.file.apply(lambda x: '+65' + str(int(x['phone'])), axis=1)
         self.file['amount'] = self.file.apply(lambda x: convert_amount(x['amount']),axis=1)
         
@@ -59,11 +60,8 @@ try:
     df
     transaction_file = PayNowTransaction(df)
     transaction_file.prepare_file()
-    st.write('Please check that the data fields (name, phone, amount) have been converted to the correct format')
+    st.write('Please check that the data fields have been converted to the correct format')
     transaction_file.file
     text_downloader(transaction_file.download_file())
 except ValueError or NameError:
     pass
-
-
-
