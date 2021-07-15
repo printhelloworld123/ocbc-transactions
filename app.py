@@ -56,9 +56,9 @@ class PayNowTransaction:
         
     # Function to standardize all required columns (name, phone, amount) #
     def prepare_file(self):
-        self.file['name'] = list(map(lambda x: self.standardize_name_column(x), list(self.file['Name'])))
-        self.file['amount'] = list(map(lambda x: self.standardize_amount_column(x), list(self.file['Amount'])))
-        self.file['phone'] = list(map(lambda x: self.standardize_phone_column(x), list(self.file['Phone'])))
+        self.file['Name'] = list(map(lambda x: self.standardize_name_column(x), list(self.file['Name'])))
+        self.file['Amount'] = list(map(lambda x: self.standardize_amount_column(x), list(self.file['Amount'])))
+        self.file['Phone'] = list(map(lambda x: self.standardize_phone_column(x), list(self.file['Phone'])))
     
     # Function to convert data into a file format accepted by OCBC # 
     def download_file(self):
