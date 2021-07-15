@@ -5,6 +5,7 @@ import streamlit as st
 
 timestr = time.strftime("%d%m%y-%H%M%S")
 
+# Function to allow download of prepared csv file as txt file #
 def text_downloader(raw_text):
 	b64 = base64.b64encode(raw_text.encode()).decode()
 	new_filename = "ocbc_paynow_{}.txt".format(timestr)
@@ -12,26 +13,52 @@ def text_downloader(raw_text):
 	href = f'<a href="data:file/txt;base64,{b64}" download="{new_filename}">Click here</a>'
 	st.markdown(href,unsafe_allow_html=True)
 
-
 class PayNowTransaction:
     def __init__(self, file):
         self.file = file
         self.date = str(date).split('-')[2] + str(date).split('-')[1] + str(date).split('-')[0]
 
-
+    # Function to prepare name column into a standard accepted by OCBC #
+    ## (remove empty spaces, capitalize all words) ##
+    def standardize_name_column(self, name):
+        new_name = str(name)
+        new_name = new_name.replace(' ', '')
+        new_name = new_name.upper()
+        return new_name
+    
+    # Function to prepare amount column into a standard accepted by OCBC #
+    ## (remove empty spaces, remove "$", fill up 17 char count req) ##
+    def standardize_amount_column(self, amount):
+        new_amount = str(amount)
+        new_amount = new_amount.replace(' ','')
+        if new_amount[0] == "$":
+            new_amount = new_amount[1:]
+        else:
+            pass
+        new_amount = str(int(float(new_amount) * 100))
+        nos_zeros = 17 - len(new_amount)
+        return "0" * nos_zeros + new_amount 
+    
+    # Function to prepare phone column into a standard accepted by OCBC #
+    ## (remove empty spaces, ensure +65 is provided) ##
+    def standardize_phone_column(self, phone):
+        new_phone = str(phone)
+        new_phone = new_phone.replace(' ','')
+        if new_phone[0:2] == "+65":
+            pass
+        elif new_phone[0:1] == "65":
+            new_phone = "+" + new_phone
+        else:
+            new_phone = "+65" + new_phone
+        return new_phone
+        
+    # Function to standardize all required columns (name, phone, amount) #
     def prepare_file(self):
-        
-        def convert_amount(amount):
-            new_value = str(int(float(amount) * 100))
-            nos_zeros = 17 - len(new_value)
-            return "0" * nos_zeros + new_value 
-        
-        self.file['name'] = self.file.apply(lambda x: x['name'].upper(), axis=1)
-        self.file['name'] = self.file.apply(lambda x: x['name'].replace(' ', ''), axis=1)
-        self.file['phone'] = self.file.apply(lambda x: '+65' + str(x['phone']), axis=1)
-        self.file['phone'] = self.file.apply(lambda x: str(x['phone']).replace(' ', ''), axis=1)
-        self.file['amount'] = self.file.apply(lambda x: convert_amount(x['amount']),axis=1)
-        
+        self.file['name'] = list(map(lambda x: self.standardize_name_column(x), list(self.file['name'])))
+        self.file['amount'] = list(map(lambda x: self.standardize_amount_column(x), list(self.file['amount'])))
+        self.file['phone'] = list(map(lambda x: self.standardize_phone_column(x), list(self.file['phone'])))
+    
+    # Function to convert data into a file format accepted by OCBC # 
     def download_file(self):
         fields = ['10' + 11 * ' ' + 'OCBCSGSGXXX695271080001'+ 169 * ' ' + 'GIRO' + 16 * ' ' + self.date + 767 * ' ']
         for i in range(len(self.file)):
@@ -48,11 +75,10 @@ class PayNowTransaction:
         return final
 
 
+# Creating the user interface #
+
 st.title('OCBC PayNow Transactions Prototype')
-
 date = st.date_input('Date of transaction', value=None, min_value=None, max_value=None, key=None, help=None)
-
-
 try:
     uploaded_file = st.file_uploader("Upload a CSV file",type=['csv'])
     df = pd.read_csv(uploaded_file)
