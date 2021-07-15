@@ -44,10 +44,12 @@ class PayNowTransaction:
     def standardize_phone_column(self, phone):
         new_phone = str(phone)
         new_phone = new_phone.replace(' ','')
-        if new_phone[0:2] == "+65":
+        if new_phone[0:3] == "+65":
             pass
-        elif new_phone[0:1] == "65":
+        elif new_phone[0:2] == "65":
             new_phone = "+" + new_phone
+        elif new_phone[0:4] == "'+65":
+            new_phone = new_phone[1:]
         else:
             new_phone = "+65" + new_phone
         return new_phone
