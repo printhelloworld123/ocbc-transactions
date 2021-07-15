@@ -56,19 +56,19 @@ class PayNowTransaction:
         
     # Function to standardize all required columns (name, phone, amount) #
     def prepare_file(self):
-        self.file['name'] = list(map(lambda x: self.standardize_name_column(x), list(self.file['name'])))
-        self.file['amount'] = list(map(lambda x: self.standardize_amount_column(x), list(self.file['amount'])))
-        self.file['phone'] = list(map(lambda x: self.standardize_phone_column(x), list(self.file['phone'])))
+        self.file['name'] = list(map(lambda x: self.standardize_name_column(x), list(self.file['Name'])))
+        self.file['amount'] = list(map(lambda x: self.standardize_amount_column(x), list(self.file['Amount'])))
+        self.file['phone'] = list(map(lambda x: self.standardize_phone_column(x), list(self.file['Phone'])))
     
     # Function to convert data into a file format accepted by OCBC # 
     def download_file(self):
         fields = ['10' + 11 * ' ' + 'OCBCSGSGXXX695271080001'+ 169 * ' ' + 'GIRO' + 16 * ' ' + self.date + 767 * ' ']
         for i in range(len(self.file)):
-            name_final = 45 * ' ' + self.file.loc[i,'name']
-            after_name_space = 188 - len(self.file.loc[i,'name']) - 45
-            amount_final = after_name_space * ' ' + self.file.loc[i,'amount']
+            name_final = 45 * ' ' + self.file.loc[i,'Name']
+            after_name_space = 188 - len(self.file.loc[i,'Name']) - 45
+            amount_final = after_name_space * ' ' + self.file.loc[i,'Amount']
             proxy_type_final = 610 * ' ' + 'MSISDN'
-            proxy_value_final = 6 * ' ' + self.file.loc[i,'phone'] + 162 * ' '
+            proxy_value_final = 6 * ' ' + self.file.loc[i,'Phone'] + 162 * ' '
             info = [name_final + amount_final + proxy_type_final + proxy_value_final]
             fields += info
         final = ''
